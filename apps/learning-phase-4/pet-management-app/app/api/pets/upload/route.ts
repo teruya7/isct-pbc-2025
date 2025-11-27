@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
   try {
+    if (!supabaseAdmin) {
+      return NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      )
+    }
+
     const userId = request.headers.get('x-user-id')
 
     if (!userId) {
@@ -31,7 +38,7 @@ export async function POST(request: NextRequest) {
     const fileName = `${userId}/${Date.now()}.${fileExt}`
 
     // Upload to Supabase Storage
-    const { data, error } = await supabase.storage
+    const { data, error } = await supabaseAdmin.storage
       .from('pet-images')
       .upload(fileName, buffer, {
         contentType: file.type,
@@ -47,7 +54,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get public URL
-    const { data: { publicUrl } } = supabase.storage
+    const { data: { publicUrl } } = supabaseAdmin.storage
       .from('pet-images')
       .getPublicUrl(data.path)
 
