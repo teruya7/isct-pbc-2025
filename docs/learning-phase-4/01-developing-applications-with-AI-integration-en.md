@@ -684,5 +684,5 @@ Once you've verified the base app works, we'll implement AI features:
 2. **Healthcare Advisor**
 3. **Image Generation**
 
-- **Next:** [AI Feature Implementation →](02-ai-features-implementation.md)
+- **Next:** [AI Feature Implementation →](02-ai-features-implementation-en.md)
 ---

@@ -684,5 +684,5 @@ npm run prisma:studio
 2. **ヘルスケアアドバイザー**
 3. **画像生成機能**
 
-- **Next:** [AI機能の実装 →](02-ai-features-implementation.md)
+- **Next:** [AI機能の実装 →](02-ai-features-implementation-jp.md)
 ---
