@@ -348,10 +348,10 @@ export async function POST(request: NextRequest) {
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
 
     const prompt = category === 'Dog'
-      ? 'この犬の画像を見て、犬種を特定してください。犬種名のみを日本語で回答してください。複数の可能性がある場合は最も可能性の高いものを1つだけ答えてください。'
+      ? 'Look at this dog image and identify the breed. Please respond with only the breed name in English. If there are multiple possibilities, answer with only the most likely one.'
       : category === 'Cat'
-      ? 'この猫の画像を見て、猫種を特定してください。猫種名のみを日本語で回答してください。複数の可能性がある場合は最も可能性の高いものを1つだけ答えてください。'
-      : 'この動物の種類を特定してください。種類名のみを日本語で回答してください。'
+      ? 'Look at this cat image and identify the breed. Please respond with only the breed name in English. If there are multiple possibilities, answer with only the most likely one.'
+      : 'Identify the species of this animal. Please respond with only the species name in English.'
 
     const result = await model.generateContent([
       {
@@ -460,7 +460,7 @@ export default function NewPetPage() {
 Also add to `app/my-pets/new/page.tsx`:
 ```typescript
 {identifying && (
-  <p className="text-sm text-blue-600">AIが品種を識別中...</p>
+  <p className="text-sm text-blue-600">AI is identifying breed...</p>
 )}
 ```
 
@@ -571,24 +571,24 @@ export async function POST(request: NextRequest) {
     const genAI = new GoogleGenerativeAI(apiKey)
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
 
-    const systemPrompt = `あなたはペットの健康アドバイザーです。以下のペット情報を参考に、飼い主からの質問に親切に答えてください。
+    const systemPrompt = `You are a pet health advisor. Please kindly answer the owner's questions based on the following pet information.
 
-ペット情報：
-- 名前: ${petInfo.name}
-- 種類: ${petInfo.category}
-- 品種: ${petInfo.breed || '不明'}
-- 性別: ${petInfo.gender || '不明'}
-- 年齢: ${petInfo.age || '不明'}
+Pet Information:
+- Name: ${petInfo.name}
+- Category: ${petInfo.category}
+- Breed: ${petInfo.breed || 'Unknown'}
+- Gender: ${petInfo.gender || 'Unknown'}
+- Age: ${petInfo.age || 'Unknown'}
 
-注意事項：
-- 一般的なアドバイスのみを提供してください
-- 緊急性が高い症状の場合は、必ず獣医に相談するよう促してください
-- 診断や処方は行わないでください
-- 優しく、わかりやすい言葉で説明してください`
+Important Notes:
+- Provide only general advice
+- If symptoms are urgent, always encourage consulting a veterinarian
+- Do not provide diagnoses or prescriptions
+- Explain in gentle, easy-to-understand language`
 
     const result = await model.generateContent([
       systemPrompt,
-      `質問: ${message}`,
+      `Question: ${message}`,
     ])
 
     const response = result.response.text()
@@ -663,7 +663,7 @@ export function HealthChat({ petInfo }: HealthChatProps) {
       console.error('Chat error:', error)
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: 'エラーが発生しました。もう一度お試しください。' },
+        { role: 'assistant', content: 'An error occurred. Please try again.' },
       ])
     } finally {
       setLoading(false)
@@ -674,7 +674,7 @@ export function HealthChat({ petInfo }: HealthChatProps) {
     return (
       <Button onClick={() => setIsOpen(true)} className="fixed bottom-4 right-4">
         <MessageCircle className="mr-2 h-4 w-4" />
-        健康相談
+        Health Consultation
       </Button>
     )
   }
@@ -682,7 +682,7 @@ export function HealthChat({ petInfo }: HealthChatProps) {
   return (
     <Card className="fixed bottom-4 right-4 w-96 h-[500px] flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>ヘルスケアアドバイザー</CardTitle>
+        <CardTitle>Healthcare Advisor</CardTitle>
         <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
           <X className="h-4 w-4" />
         </Button>
@@ -691,7 +691,7 @@ export function HealthChat({ petInfo }: HealthChatProps) {
         <div className="flex-1 overflow-y-auto space-y-4 mb-4 min-h-0">
           {messages.length === 0 && (
             <p className="text-sm text-gray-600">
-              {petInfo.name}の健康について、何でもお聞きください!
+              Ask me anything about {petInfo.name}'s health!
             </p>
           )}
           {messages.map((msg, idx) => (
@@ -708,7 +708,7 @@ export function HealthChat({ petInfo }: HealthChatProps) {
           ))}
           {loading && (
             <div className="bg-gray-100 p-3 rounded-lg mr-auto max-w-[80%]">
-              <p className="text-sm">考え中...</p>
+              <p className="text-sm">Thinking...</p>
             </div>
           )}
         </div>
@@ -717,7 +717,7 @@ export function HealthChat({ petInfo }: HealthChatProps) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="質問を入力..."
+            placeholder="Enter your question..."
             disabled={loading}
           />
           <Button onClick={handleSend} disabled={loading || !input.trim()}>
@@ -882,15 +882,15 @@ export async function POST(request: NextRequest) {
         const img2Base64 = Buffer.from(img2Buffer).toString('base64')
 
         // Analyze parent features with Gemini
-        const analysisPrompt = `これら2匹のペットの画像を見て、それぞれの視覚的特徴(毛色、模様、目の色、体格など)を簡潔に英語で説明してください。
+        const analysisPrompt = `Look at these two pet images and describe their visual characteristics (fur color, patterns, eye color, body type, etc.) concisely in English.
 
-1枚目: ${parent1.name} (${parent1.breed || parent1.category})
-2枚目: ${parent2.name} (${parent2.breed || parent2.category})
+Image 1: ${parent1.name} (${parent1.breed || parent1.category})
+Image 2: ${parent2.name} (${parent2.breed || parent2.category})
 
-以下の形式で回答してください:
-Parent 1: [毛色], [模様の特徴], [その他の特徴]
-Parent 2: [毛色], [模様の特徴], [その他の特徴]
-Child (mix): [2匹の特徴を組み合わせた子供の想像される見た目]`
+Please respond in the following format:
+Parent 1: [fur color], [pattern characteristics], [other features]
+Parent 2: [fur color], [pattern characteristics], [other features]
+Child (mix): [imagined appearance of child combining features of both]`
 
         const result = await model.generateContent([
           {
@@ -1064,12 +1064,12 @@ export default function GenerateChildPage() {
 
   const handleGenerate = async () => {
     if (!parent1Id || !parent2Id) {
-      alert('2匹のペットを選択してください')
+      alert('Please select two pets')
       return
     }
 
     if (parent1Id === parent2Id) {
-      alert('異なるペットを選択してください')
+      alert('Please select different pets')
       return
     }
 
@@ -1096,7 +1096,7 @@ export default function GenerateChildPage() {
       setGeneratedImage(data.imageUrl)
     } catch (error) {
       console.error('Generate error:', error)
-      alert('画像の生成に失敗しました')
+      alert('Failed to generate image')
     } finally {
       setGenerating(false)
     }
@@ -1107,7 +1107,7 @@ export default function GenerateChildPage() {
       <div className="min-h-screen bg-gray-50">
         <Navbar />
         <div className="container mx-auto px-4 py-8">
-          <div className="text-center">読み込み中...</div>
+          <div className="text-center">Loading...</div>
         </div>
       </div>
     )
@@ -1120,7 +1120,7 @@ export default function GenerateChildPage() {
         <Link href="/my-pets">
           <Button variant="ghost" className="mb-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            ペット一覧に戻る
+            Back to Pet List
           </Button>
         </Link>
 
@@ -1128,20 +1128,20 @@ export default function GenerateChildPage() {
           <CardHeader>
             <CardTitle className="flex items-center">
               <Sparkles className="mr-2 h-5 w-5" />
-              子供のイメージ画像を生成
+              Generate Child Image
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <p className="text-sm text-gray-600">
-              2匹のペットを選択すると、その子供の姿をAIが生成します。
+              Select two pets and AI will generate an image of their child.
             </p>
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">親1を選択</label>
+                <label className="text-sm font-medium">Select Parent 1</label>
                 <Select value={parent1Id} onValueChange={setParent1Id}>
                   <SelectTrigger>
-                    <SelectValue placeholder="ペットを選択..." />
+                    <SelectValue placeholder="Select a pet..." />
                   </SelectTrigger>
                   <SelectContent>
                     {pets.map((pet) => (
@@ -1154,10 +1154,10 @@ export default function GenerateChildPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">親2を選択</label>
+                <label className="text-sm font-medium">Select Parent 2</label>
                 <Select value={parent2Id} onValueChange={setParent2Id}>
                   <SelectTrigger>
-                    <SelectValue placeholder="ペットを選択..." />
+                    <SelectValue placeholder="Select a pet..." />
                   </SelectTrigger>
                   <SelectContent>
                     {pets.map((pet) => (
@@ -1175,12 +1175,12 @@ export default function GenerateChildPage() {
               disabled={!parent1Id || !parent2Id || generating}
               className="w-full"
             >
-              {generating ? '生成中...' : '子供の画像を生成'}
+              {generating ? 'Generating...' : 'Generate Child Image'}
             </Button>
 
             {generatedImage && (
               <div className="space-y-2">
-                <p className="text-sm font-medium">生成された画像:</p>
+                <p className="text-sm font-medium">Generated Image:</p>
                 <img
                   src={generatedImage}
                   alt="Generated child"
@@ -1237,7 +1237,7 @@ Change the page title and button section (around lines 72-79) as follows:
     <Link href="/my-pets/generate">
       <Button variant="outline">
         <Sparkles className="mr-2 h-4 w-4" />
-        子供を生成
+        Generate Child
       </Button>
     </Link>
     <Link href="/my-pets/new">
