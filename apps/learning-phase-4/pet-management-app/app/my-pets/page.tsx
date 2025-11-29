@@ -1,38 +1,38 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Navbar } from "@/components/layout/navbar"
-import { Plus } from "lucide-react"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Navbar } from "@/components/layout/navbar";
+import { Plus, Sparkles } from "lucide-react";
 
 interface Pet {
-  id: string
-  name: string
-  category: string
-  breed?: string
-  imageUrl?: string
+  id: string;
+  name: string;
+  category: string;
+  breed?: string;
+  imageUrl?: string;
 }
 
 export default function MyPetsPage() {
-  const router = useRouter()
-  const [pets, setPets] = useState<Pet[]>([])
-  const [loading, setLoading] = useState(true)
-  const [user, setUser] = useState<any>(null)
+  const router = useRouter();
+  const [pets, setPets] = useState<Pet[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     // Check if user is logged in
-    const userData = localStorage.getItem("user")
+    const userData = localStorage.getItem("user");
     if (!userData) {
-      router.push("/login")
-      return
+      router.push("/login");
+      return;
     }
-    setUser(JSON.parse(userData))
-    fetchPets(JSON.parse(userData))
-  }, [router])
+    setUser(JSON.parse(userData));
+    fetchPets(JSON.parse(userData));
+  }, [router]);
 
   const fetchPets = async (userData: any) => {
     try {
@@ -40,20 +40,20 @@ export default function MyPetsPage() {
         headers: {
           "x-user-id": userData.id,
         },
-      })
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to fetch pets")
+        throw new Error("Failed to fetch pets");
       }
 
-      const data = await response.json()
-      setPets(data.pets)
+      const data = await response.json();
+      setPets(data.pets);
     } catch (error) {
-      console.error("Fetch pets error:", error)
+      console.error("Fetch pets error:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -63,7 +63,7 @@ export default function MyPetsPage() {
           <div className="text-center">Loading...</div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -72,18 +72,28 @@ export default function MyPetsPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">My Pets</h1>
-          <Link href="/my-pets/new">
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Add New Pet
-            </Button>
-          </Link>
+          <div className="flex gap-2">
+            <Link href="/my-pets/generate">
+              <Button variant="outline">
+                <Sparkles className="mr-2 h-4 w-4" />
+                子供を生成
+              </Button>
+            </Link>
+            <Link href="/my-pets/new">
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Add New Pet
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {pets.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center">
-              <p className="text-gray-600 mb-4">You don&apos;t have any pets yet.</p>
+              <p className="text-gray-600 mb-4">
+                You don&apos;t have any pets yet.
+              </p>
               <Link href="/my-pets/new">
                 <Button>Add Your First Pet</Button>
               </Link>
@@ -116,5 +126,5 @@ export default function MyPetsPage() {
         )}
       </div>
     </div>
-  )
+  );
 }
